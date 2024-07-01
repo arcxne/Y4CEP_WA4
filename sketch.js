@@ -1,67 +1,146 @@
 // main sketch file
 
-let player;
+let player1, player2;
+let base_speeds = [7, 7];
+let scores = [0, 0];
 let ball;
-let monster1;
+let balls = [];
+let wall_top, wall_bottom;
+
+let ballSpeedMulti;
 
 function setup() {
-  createCanvas(800, 800);
+  new Canvas(800, 400);
 
-  // drawObjects();
-  // setupScene();
+  noStroke();
+
+  drawObjects();
+
+  ball.direction = 150;
+  ball.speed = 22;
 }
 
 function draw() {
   background(0);
 
-  // playerLogic();
+  game_screen();
+}
+
+function game_screen() {
+  if (player1 == null) {
+    drawObjects();
+  }
+
+  playerLogic();
+  ballLogic();
+  mutation1();
+
+  fill(255);
+  textSize(45);
+  text(scores[0], width/4, height/8);
+  text(scores[1], width*3/4, height/8);
 }
 
 function drawObjects() {
-  player = new Sprite();
+  player1 = new Sprite();
 
-  player.width = 60;
-  player.height = 60
-  player.x = width/2;
-  player.y = height/10;
-  player.color = '#2a9d8f';
-  player.collider = 'kinematic';
+  player1.width = 15;
+  player1.height = 90
+  player1.x = 30;
+  player1.y = height/2;
+  player1.color = '#FFFFFF';
+  player1.collider = 'kinematic';
+
+  player2 = new Sprite();
+
+  player2.width = 15;
+  player2.height = 90;
+  player2.x = width-30;
+  player2.y = height/2;
+  player2.color = '#FFFFFF';
+  player2.collider = 'kinematic';
 
   ball = new Sprite();
 
-  ball.diameter = 80;
-  ball.x = width/2;
-  ball.y = height/2;
-  ball.color = '#DDA178';
+  ball.diameter = 30;
+  ball.x = width/4;
+  ball.y = height/4+10;
+  ball.color = '#FFFFFF';
   ball.collider = 'dynamic';
   ball.friction = 0;
-  ball.bounciness = 0;
-  ball.rotationLock = true;
+  ball.drag = 0;
+  ball.bounciness = 1;
+//  ball.rotationLock = true;
 
-  monster1 = new Sprite();
+  wall_top = new Sprite();
 
-  monster1.width = 40;
-  monster1.height = 40;
-  monster1.x = width/4;
-  monster1.y = height/2;
-  monster1.color = 'red';
-  monster1.collider = 'kinematic';
-}
+  wall_top.width = width*2;
+  wall_top.height = 10;
+  wall_top.x = width/2;
+  wall_top.y = -5;
+  wall_top.collider = 'k';
+  wall_top.friction = 0;
 
-function setupScene() {
+  wall_bottom = new Sprite();
 
-  // setup walls
-
+  wall_bottom.width = width*2;
+  wall_bottom.height = 10;
+  wall_bottom.x = width/2;
+  wall_bottom.y = height/5;
+  wall_bottom.collider = 'k';
+  wall_bottom.friction = 0;
 }
 
 function playerLogic() {
-  // player follows mouse
-  let posX = constrain(mouseX, 40, 760);
-  player.moveTowards(posX, player.y, 0.25);
+  if (kb.pressing('w')) {
+    player1.vel.y = -base_speeds[0];
+  } else if (kb.pressing('s')) {
+    player1.vel.y = base_speeds[0];
+  } else {
+    player1.vel.y = 0;
+  }
 
-  // switch sides when SpaceBar is pressed
-  if (kb.presses("space")) {
-    if (player.y > height/2) player.y = height/10;
-    else player.y = height*9/10;
+
+  if (kb.pressing('arrow_up')) {
+    player2.vel.y = -base_speeds[1];
+  } else if (kb.pressing('arrow_down')) {
+    player2.vel.y = base_speeds[1];
+  } else {
+    player2.vel.y = 0;
+  }
+}
+
+function ballLogic() {
+  if (ball.x < -150 || ball.x > width+150) {
+    if (ball.x < width/2) scores[1]++;
+    else scores[0]++;
+    ball.x = width/2;
+    ball.speed = (ball.speed > 10)? 10 : ball.speed;
+  }
+
+  if (ball.direction > 80 && ball.direction < 110) {
+    if (110-ball.direction > 20) {
+      ball.direction -= 110-ball.direction;
+    } else {
+      ball.direction += ball.direction-80;
+    }
+  }
+}
+
+function mutation1() {
+  // goofy spin
+
+  base_speeds[0] = 9;
+  base_speeds[1] = 9;
+
+  player1.rotateTo(player1.vel.y*5, (player1.vel.y == 0)? base_speeds[0]*1.5 : player1.vel.y/2);
+  player2.rotateTo(player2.vel.y*5, (player2.vel.y == 0)? -base_speeds[1]*1.5 : player2.vel.y/2);
+}
+
+function mutation2() {
+  // multiple balls
+  
+  for (let i=0; i<9; i++) {
+
   }
 }
