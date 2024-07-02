@@ -7,7 +7,9 @@ let ball;
 let balls = [];
 let wall_top, wall_bottom;
 
-let ballSpeedMulti;
+let startingSpeed = 7;
+
+let mutation3trigger = true;
 
 function setup() {
   new Canvas(800, 400);
@@ -34,6 +36,8 @@ function game_screen() {
   playerLogic();
   ballLogic();
   mutation1();
+  mutation2();
+  if (mutation3trigger) mutation3();
 
   fill(255);
   textSize(45);
@@ -86,7 +90,7 @@ function drawObjects() {
   wall_bottom.width = width*2;
   wall_bottom.height = 10;
   wall_bottom.x = width/2;
-  wall_bottom.y = height/5;
+  wall_bottom.y = height+5;
   wall_bottom.collider = 'k';
   wall_bottom.friction = 0;
 }
@@ -115,7 +119,7 @@ function ballLogic() {
     if (ball.x < width/2) scores[1]++;
     else scores[0]++;
     ball.x = width/2;
-    ball.speed = (ball.speed > 10)? 10 : ball.speed;
+    ball.speed = (ball.speed > startingSpeed)? startingSpeed : ball.speed;
   }
 
   if (ball.direction > 80 && ball.direction < 110) {
@@ -133,14 +137,48 @@ function mutation1() {
   base_speeds[0] = 9;
   base_speeds[1] = 9;
 
-  player1.rotateTo(player1.vel.y*5, (player1.vel.y == 0)? base_speeds[0]*1.5 : player1.vel.y/2);
-  player2.rotateTo(player2.vel.y*5, (player2.vel.y == 0)? -base_speeds[1]*1.5 : player2.vel.y/2);
+  player1.rotateTo(player1.vel.y*5, (player1.vel.y == 0)? base_speeds[0] : player1.vel.y/3);
+  player2.rotateTo(player2.vel.y*5, (player2.vel.y == 0)? -base_speeds[1] : player2.vel.y/3);
 }
 
 function mutation2() {
+  // balls speed up whenever mov keys are pressed
+
+  if (
+    kb.presses('w') ||
+    kb.presses('s') ||
+    kb.presses('arrow_up') ||
+    kb.presses('arrow+down')
+  ) {
+    ball.speed *= 1.05;
+  }
+}
+
+function mutation3() {
   // multiple balls
   
-  for (let i=0; i<9; i++) {
+  for (let i=0; i<4; i++) {
+    let bally = new Sprite();
 
+    bally.diameter = 30;
+    bally.x = width/4;
+    bally.y = height/4+10*i+20;
+    bally.color = '#FFFFFF';
+    bally.collider = 'dynamic';
+    bally.friction = 0;
+    bally.drag = 0;
+    bally.bounciness = 1;
+    
+    balls.push(bally);
   }
+
+  balls.push(ball);
+
+  startingSpeed = 5;
+
+  mutation3trigger = false;
+}
+
+function mutation4() {
+  // balls are tiny
 }
